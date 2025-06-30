@@ -19,7 +19,7 @@ A modern, scalable order management system built with Node.js, Express, MongoDB,
 - **Dashboard**: Real-time statistics and system status
 - **Responsive Design**: Mobile-first approach
 
-## 🛠️ Technology Stack
+## Technology Stack
 
 ### Backend
 - **Node.js** - Runtime environment
@@ -199,7 +199,7 @@ cd finmark-auth-frontend
 npm test
 ```
 
-## 📈 Performance Optimizations
+## Performance Optimizations
 
 - **Database indexing** for faster queries
 - **Pagination** for large datasets
