@@ -218,33 +218,6 @@ npm test
 1. Build the application: `npm run build`
 2. Deploy the `build` folder to your hosting service
 
-## API Documentation
-
-### Request/Response Format
-All API responses follow a consistent format:
-
-```json
-{
-  "success": true,
-  "message": "Operation successful",
-  "data": {
-    // Response data
-  }
-}
-```
-
-### Error Response Format
-```json
-{
-  "success": false,
-  "message": "Error description",
-  "errors": [
-    {
-      "field": "fieldName",
-      "message": "Specific error message"
-    }
-  ]
-}
 ```
 
 ## Contributing
