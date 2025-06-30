@@ -218,8 +218,6 @@ npm test
 1. Build the application: `npm run build`
 2. Deploy the `build` folder to your hosting service
 
-```
-
 ## Contributing
 
 1. Fork the repository
