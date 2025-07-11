@@ -1,5 +1,6 @@
 # Node
 node_modules/
+finmark-auth-frontend/node_modules/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
@@ -26,6 +27,3 @@ logs
 .vscode/
 .idea/
 *.swp
-
-# Frontend node_modules
-finmark-auth-frontend/node_modules/
