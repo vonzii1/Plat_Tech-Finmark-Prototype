@@ -1,0 +1,29 @@
+# Node
+node_modules/
+finmark-auth-frontend/node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Build output
+finmark-auth-frontend/build/
+build/
+dist/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Env
+.env
+.env.local
+.env.*.local
+
+# Logs
+logs
+*.log
+
+# Editor
+.vscode/
+.idea/
+*.swp
