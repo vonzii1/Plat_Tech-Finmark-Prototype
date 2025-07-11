@@ -9,7 +9,8 @@ const {
   getOrderById,
   updateOrderStatus,
   cancelOrder,
-  getOrderStats
+  getOrderStats,
+  getAllOrders
 } = require('../controllers/orderController');
 
 // Validation rules
@@ -34,7 +35,7 @@ const createOrderValidation = [
     .trim()
     .notEmpty()
     .withMessage('Customer phone number is required')
-    .matches(/^[\+]?[1-9][\d]{0,15}$/)
+    .matches(/^[\+]?\d{10,15}$/)
     .withMessage('Please enter a valid phone number'),
   body('items')
     .isArray({ min: 1 })
@@ -53,26 +54,6 @@ const createOrderValidation = [
   body('items.*.unitPrice')
     .isFloat({ min: 0 })
     .withMessage('Unit price must be a non-negative number'),
-  body('shippingAddress.street')
-    .trim()
-    .isLength({ min: 5, max: 100 })
-    .withMessage('Street address must be between 5 and 100 characters'),
-  body('shippingAddress.city')
-    .trim()
-    .isLength({ min: 2, max: 50 })
-    .withMessage('City must be between 2 and 50 characters'),
-  body('shippingAddress.state')
-    .trim()
-    .isLength({ min: 2, max: 50 })
-    .withMessage('State must be between 2 and 50 characters'),
-  body('shippingAddress.zipCode')
-    .trim()
-    .matches(/^\d{5}(-\d{4})?$/)
-    .withMessage('Please enter a valid ZIP code'),
-  body('shippingAddress.country')
-    .trim()
-    .isLength({ min: 2, max: 50 })
-    .withMessage('Country must be between 2 and 50 characters'),
   body('notes')
     .optional()
     .trim()
@@ -100,8 +81,9 @@ const updateOrderStatusValidation = [
 router.post('/', auth, createOrderValidation, handleValidationErrors, createOrder);
 router.get('/', auth, getUserOrders);
 router.get('/stats', auth, requireRole(['admin', 'manager']), getOrderStats);
+router.get('/all', auth, requireRole(['admin', 'manager']), getAllOrders);
 router.get('/:orderId', auth, getOrderById);
-router.put('/:orderId/status', auth, requireRole(['admin', 'manager']), updateOrderStatusValidation, handleValidationErrors, updateOrderStatus);
+router.put('/:orderId/status', auth, requireRole(['admin', 'manager', 'staff']), updateOrderStatusValidation, handleValidationErrors, updateOrderStatus);
 router.put('/:orderId/cancel', auth, cancelOrder);
 
 module.exports = router; 

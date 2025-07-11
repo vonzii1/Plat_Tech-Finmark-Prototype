@@ -5,6 +5,7 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
+const path = require('path');
 
 // Import routes
 const authRoutes = require('./routes/authRoutes');
@@ -51,6 +52,14 @@ app.use('/api/auth', authRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/products', productRoutes);
 app.use('/api/users', userRoutes);
+
+// Serve static files from the React app
+app.use(express.static(path.join(__dirname, 'finmark-auth-frontend', 'build')));
+
+// All other GET requests not handled before will return the React app
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'finmark-auth-frontend', 'build', 'index.html'));
+});
 
 // 404 handler
 app.use('*', (req, res) => {

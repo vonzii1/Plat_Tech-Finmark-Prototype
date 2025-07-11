@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { ShoppingCart, Package, User, Settings, Plus } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import axios from 'axios';
 
 const AdminDashboard = ({ user, stats }) => {
   const totalOrders = stats?.orders?.totalOrders || 0;
@@ -8,7 +9,32 @@ const AdminDashboard = ({ user, stats }) => {
   const totalProducts = Array.isArray(stats?.products) ? stats.products.length : 0;
   const totalUsers = Array.isArray(stats?.users) ? stats.users.length : 0;
   const recentUsers = Array.isArray(stats?.users) ? stats.users.slice(0, 5) : [];
-  const recentOrders = Array.isArray(stats?.orders?.recentOrders) ? stats.orders.recentOrders.slice(0, 5) : [];
+  const [recentOrders, setRecentOrders] = useState([]);
+  const [ordersLoading, setOrdersLoading] = useState(true);
+  const [ordersError, setOrdersError] = useState('');
+
+  const lowStockProducts = Array.isArray(stats?.products)
+    ? stats.products.filter(p => p.stockQuantity < 10)
+    : [];
+
+  const recentProducts = Array.isArray(stats?.products)
+    ? stats.products.slice(-5).reverse()
+    : [];
+
+  useEffect(() => {
+    const fetchOrders = async () => {
+      try {
+        setOrdersLoading(true);
+        const res = await axios.get('/api/orders/all?limit=5');
+        setRecentOrders(res.data.data.orders || []);
+      } catch (err) {
+        setOrdersError('Failed to load recent orders.');
+      } finally {
+        setOrdersLoading(false);
+      }
+    };
+    fetchOrders();
+  }, []);
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -50,14 +76,47 @@ const AdminDashboard = ({ user, stats }) => {
         </div>
         <div className="bg-white rounded-lg shadow p-6">
           <h3 className="text-lg font-semibold text-gray-900 mb-4">Recent Orders</h3>
+          {ordersLoading ? (
+            <div>Loading recent orders...</div>
+          ) : ordersError ? (
+            <div className="text-red-500">{ordersError}</div>
+          ) : recentOrders.length === 0 ? (
+            <div className="text-gray-500">No recent orders.</div>
+          ) : (
+            <ul>
+              {recentOrders.map(o => (
+                <li key={o._id} className="flex items-center justify-between py-2 border-b last:border-b-0">
+                  <span>Order #{o.orderNumber || o._id} <span className="text-xs text-gray-500">by {o.userId?.firstName} {o.userId?.lastName}</span></span>
+                  <span className="text-xs text-gray-400">{new Date(o.createdAt).toLocaleDateString()}</span>
+                  <span className="text-xs text-blue-600 font-bold">{o.status}</span>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+      </div>
+      {/* Product KPIs */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
+        <div className="bg-white rounded-lg shadow p-6">
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">Low Stock Products</h3>
           <ul>
-            {recentOrders.map(o => (
-              <li key={o._id} className="flex items-center justify-between py-2 border-b last:border-b-0">
-                <span>Order #{o.orderNumber} <span className="text-xs text-gray-500">by {o.customerName || o.customer || 'N/A'}</span></span>
-                <span className="text-xs text-gray-400">{new Date(o.createdAt).toLocaleDateString()}</span>
+            {lowStockProducts.length > 0 ? lowStockProducts.map(p => (
+              <li key={p._id || p.productId} className="flex justify-between py-2 border-b last:border-b-0">
+                <span>{p.name} ({p.category})</span>
+                <span className="text-xs text-red-600 font-bold">{p.stockQuantity} left</span>
               </li>
-            ))}
-            {recentOrders.length === 0 && <li className="text-gray-500">No recent orders.</li>}
+            )) : <li className="text-gray-500">No low stock products.</li>}
+          </ul>
+        </div>
+        <div className="bg-white rounded-lg shadow p-6">
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">Recently Added Products</h3>
+          <ul>
+            {recentProducts.length > 0 ? recentProducts.map(p => (
+              <li key={p._id || p.productId} className="flex justify-between py-2 border-b last:border-b-0">
+                <span>{p.name} ({p.category})</span>
+                <span className="text-xs text-gray-400">{p.createdAt ? new Date(p.createdAt).toLocaleDateString() : ''}</span>
+              </li>
+            )) : <li className="text-gray-500">No recent products.</li>}
           </ul>
         </div>
       </div>

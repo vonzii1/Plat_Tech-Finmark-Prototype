@@ -80,11 +80,15 @@ const Navbar = () => {
           {/* User Menu */}
           <div className="hidden md:flex items-center space-x-4">
             <div className="flex items-center space-x-2">
-              <div className="h-8 w-8 bg-blue-100 rounded-full flex items-center justify-center">
-                <span className="text-sm font-medium text-blue-600">
-                  {user?.firstName?.charAt(0)}{user?.lastName?.charAt(0)}
-                </span>
-              </div>
+              {user?.profilePicture ? (
+                <img src={user.profilePicture} alt="Profile" className="h-8 w-8 rounded-full object-cover border-2 border-blue-200 shadow" />
+              ) : (
+                <div className="h-8 w-8 bg-blue-100 rounded-full flex items-center justify-center">
+                  <span className="text-sm font-medium text-blue-600">
+                    {user?.firstName?.charAt(0)}{user?.lastName?.charAt(0)}
+                  </span>
+                </div>
+              )}
               <div className="text-sm">
                 <p className="font-medium text-gray-900">
                   {user?.firstName} {user?.lastName}
@@ -143,11 +147,15 @@ const Navbar = () => {
             {/* Mobile User Info */}
             <div className="px-3 py-3 border-t border-gray-200">
               <div className="flex items-center space-x-3">
-                <div className="h-8 w-8 bg-blue-100 rounded-full flex items-center justify-center">
-                  <span className="text-sm font-medium text-blue-600">
-                    {user?.firstName?.charAt(0)}{user?.lastName?.charAt(0)}
-                  </span>
-                </div>
+                {user?.profilePicture ? (
+                  <img src={user.profilePicture} alt="Profile" className="h-8 w-8 rounded-full object-cover border-2 border-blue-200 shadow" />
+                ) : (
+                  <div className="h-8 w-8 bg-blue-100 rounded-full flex items-center justify-center">
+                    <span className="text-sm font-medium text-blue-600">
+                      {user?.firstName?.charAt(0)}{user?.lastName?.charAt(0)}
+                    </span>
+                  </div>
+                )}
                 <div className="flex-1">
                   <p className="text-sm font-medium text-gray-900">
                     {user?.firstName} {user?.lastName}

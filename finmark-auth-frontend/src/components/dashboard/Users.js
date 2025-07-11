@@ -10,6 +10,14 @@ const initialForm = {
   email: '',
   password: '',
   role: 'user',
+  phone: '',
+  profilePicture: '',
+  street: '',
+  barangay: '',
+  city: '',
+  province: '',
+  zipCode: '',
+  country: 'Philippines',
 };
 
 const Users = () => {
@@ -104,6 +112,16 @@ const Users = () => {
       email: user.email,
       role: user.role,
       isActive: user.isActive,
+      profilePicture: user.profilePicture || '',
+      ...(user.role === 'user' ? {
+        phone: user.phone || '',
+        street: user.address?.street || '',
+        barangay: user.address?.barangay || '',
+        city: user.address?.city || '',
+        province: user.address?.province || '',
+        zipCode: user.address?.zipCode || '',
+        country: user.address?.country || 'Philippines',
+      } : {})
     });
     setEditError(null);
     setEditModal(true);
@@ -114,12 +132,56 @@ const Users = () => {
     setEditForm(f => ({ ...f, [name]: type === 'checkbox' ? checked : value }));
   };
 
+  const handleProfilePicChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const maxSize = 5 * 1024 * 1024; // 5MB
+      if (file.size > maxSize) {
+        setEditError('Profile picture must be less than 5MB');
+        return;
+      }
+      const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
+      if (!allowedTypes.includes(file.type)) {
+        setEditError('Please select a valid image file (JPEG, PNG, or GIF)');
+        return;
+      }
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setEditForm(f => ({ ...f, profilePicture: reader.result }));
+        setEditError(null);
+      };
+      reader.onerror = () => {
+        setEditError('Failed to read the image file');
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   const handleEditUser = async (e) => {
     e.preventDefault();
     setEditLoading(true);
     setEditError(null);
     try {
-      const res = await axios.put(`/api/users/${editUserId}`, editForm);
+      const updateData = {
+        firstName: editForm.firstName,
+        lastName: editForm.lastName,
+        email: editForm.email,
+        role: editForm.role,
+        isActive: editForm.isActive,
+        ...(editForm.role === 'user' ? {
+          profilePicture: editForm.profilePicture,
+          phone: editForm.phone,
+          address: {
+            street: editForm.street,
+            barangay: editForm.barangay,
+            city: editForm.city,
+            province: editForm.province,
+            zipCode: editForm.zipCode,
+            country: editForm.country,
+          },
+        } : {})
+      };
+      const res = await axios.put(`/api/users/${editUserId}`, updateData);
       setUsers(users.map(u => u._id === editUserId ? res.data.user : u));
       setEditModal(false);
       setEditUserId(null);
@@ -286,72 +348,82 @@ const Users = () => {
               <X className="h-5 w-5" />
             </button>
             <h2 className="text-xl font-bold mb-4">Edit User</h2>
-            {editError && <div className="text-red-500 mb-2">{editError}</div>}
             <form onSubmit={handleEditUser} className="space-y-4">
+              {editForm.role === 'user' && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Profile Picture</label>
+                  <div className="flex items-center space-x-4">
+                    {editForm.profilePicture ? (
+                      <img src={editForm.profilePicture} alt="Profile" className="w-16 h-16 rounded-full object-cover border-2 border-gray-300" />
+                    ) : (
+                      <div className="w-16 h-16 rounded-full bg-gray-200 flex items-center justify-center text-2xl text-gray-400 border-2 border-gray-300">?</div>
+                    )}
+                    <label className="bg-white rounded-full p-2 shadow cursor-pointer border border-gray-200 hover:bg-blue-600 hover:text-white transition-colors">
+                      <input type="file" accept="image/*" onChange={handleProfilePicChange} className="hidden" />
+                      <span className="text-xs">Upload</span>
+                    </label>
+                  </div>
+                </div>
+              )}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">First Name</label>
-                <input
-                  type="text"
-                  name="firstName"
-                  value={editForm.firstName}
-                  onChange={handleEditFormChange}
-                  className="w-full border border-gray-300 rounded-md px-3 py-2"
-                  required
-                />
+                <input type="text" name="firstName" value={editForm.firstName} onChange={handleEditFormChange} className="w-full border rounded-lg px-3 py-2" required />
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Last Name</label>
-                <input
-                  type="text"
-                  name="lastName"
-                  value={editForm.lastName}
-                  onChange={handleEditFormChange}
-                  className="w-full border border-gray-300 rounded-md px-3 py-2"
-                  required
-                />
+                <input type="text" name="lastName" value={editForm.lastName} onChange={handleEditFormChange} className="w-full border rounded-lg px-3 py-2" required />
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
-                <input
-                  type="email"
-                  name="email"
-                  value={editForm.email}
-                  onChange={handleEditFormChange}
-                  className="w-full border border-gray-300 rounded-md px-3 py-2"
-                  required
-                />
+                <input type="email" name="email" value={editForm.email} onChange={handleEditFormChange} className="w-full border rounded-lg px-3 py-2" required />
               </div>
+              {editForm.role === 'user' && (
+                <>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Phone</label>
+                    <input type="text" name="phone" value={editForm.phone} onChange={handleEditFormChange} className="w-full border rounded-lg px-3 py-2" placeholder="e.g. +639171234567" pattern="^(\+?63|0)9\d{9}$" />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Street Address</label>
+                    <input type="text" name="street" value={editForm.street} onChange={handleEditFormChange} className="w-full border rounded-lg px-3 py-2" placeholder="e.g. 123 Main St, Apartment 4B" />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Barangay</label>
+                    <input type="text" name="barangay" value={editForm.barangay} onChange={handleEditFormChange} className="w-full border rounded-lg px-3 py-2" placeholder="e.g. Brgy. San Isidro" />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">City/Municipality</label>
+                    <input type="text" name="city" value={editForm.city} onChange={handleEditFormChange} className="w-full border rounded-lg px-3 py-2" placeholder="e.g. Quezon City" />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Province</label>
+                    <input type="text" name="province" value={editForm.province} onChange={handleEditFormChange} className="w-full border rounded-lg px-3 py-2" placeholder="e.g. Metro Manila" />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">ZIP Code</label>
+                    <input type="text" name="zipCode" value={editForm.zipCode} onChange={handleEditFormChange} className="w-full border rounded-lg px-3 py-2" placeholder="e.g. 1100" pattern="^[0-9]{4}$" />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Country</label>
+                    <input type="text" name="country" value={editForm.country} onChange={handleEditFormChange} className="w-full border rounded-lg px-3 py-2 bg-gray-100" readOnly />
+                  </div>
+                </>
+              )}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Role</label>
-                <select
-                  name="role"
-                  value={editForm.role}
-                  onChange={handleEditFormChange}
-                  className="w-full border border-gray-300 rounded-md px-3 py-2"
-                  required
-                >
+                <select name="role" value={editForm.role} onChange={handleEditFormChange} className="w-full border rounded-lg px-3 py-2">
                   <option value="user">User</option>
-                  <option value="manager">Manager</option>
                   <option value="admin">Admin</option>
+                  <option value="manager">Staff</option>
                 </select>
               </div>
-              <div className="flex items-center">
-                <input
-                  type="checkbox"
-                  name="isActive"
-                  checked={editForm.isActive}
-                  onChange={handleEditFormChange}
-                  className="mr-2"
-                />
-                <label className="text-sm font-medium text-gray-700">Active</label>
+              <div className="flex items-center space-x-4 mt-4">
+                <button type="submit" disabled={editLoading} className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50">
+                  {editLoading ? 'Saving...' : 'Save Changes'}
+                </button>
+                <button type="button" onClick={handleCloseEditModal} className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors">Cancel</button>
+                {editError && <span className="text-red-600 text-sm ml-2">{editError}</span>}
               </div>
-              <button
-                type="submit"
-                className="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
-                disabled={editLoading}
-              >
-                {editLoading ? 'Saving...' : 'Save Changes'}
-              </button>
             </form>
           </div>
         </div>

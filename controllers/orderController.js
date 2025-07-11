@@ -107,7 +107,6 @@ exports.createOrder = async (req, res) => {
       customerInfo,
       items: processedItems,
       orderTotal,
-      shippingAddress,
       notes: notes?.trim(),
       estimatedDelivery: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) // 7 days from now
     });
@@ -411,5 +410,20 @@ exports.getOrderStats = async (req, res) => {
       success: false,
       message: 'Server error while fetching order statistics.'
     });
+  }
+};
+
+// Get all orders (admin/manager only)
+exports.getAllOrders = async (req, res) => {
+  try {
+    const { limit = 10 } = req.query;
+    const orders = await Order.find({})
+      .sort({ createdAt: -1 })
+      .limit(Number(limit))
+      .populate('userId', 'firstName lastName email');
+    res.status(200).json({ success: true, data: { orders } });
+  } catch (error) {
+    console.error('Get all orders error:', error);
+    res.status(500).json({ success: false, message: 'Server error while fetching all orders.' });
   }
 }; 

@@ -89,12 +89,15 @@ export const AuthProvider = ({ children }) => {
     localStorage.removeItem('token');
     delete axios.defaults.headers.common['Authorization'];
     toast.success('Logged out successfully');
+    window.location.href = '/login'; // Redirect to login after logout
   };
 
   // Update user profile
   const updateProfile = async (profileData) => {
     try {
-      const response = await axios.put('/api/auth/profile', profileData);
+      await axios.put('/api/auth/profile', profileData);
+      // Immediately re-fetch the user profile to get the latest profilePicture
+      const response = await axios.get('/api/auth/profile');
       setUser(response.data.data.user);
       toast.success('Profile updated successfully!');
       return { success: true };
