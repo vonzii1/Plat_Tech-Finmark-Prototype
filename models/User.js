@@ -38,6 +38,22 @@ const UserSchema = new mongoose.Schema({
   lastLogin: {
     type: Date,
     default: null
+  },
+  phone: {
+    type: String,
+    default: ''
+  },
+  address: {
+    street: { type: String, default: '' },
+    barangay: { type: String, default: '' },
+    city: { type: String, default: '' },
+    province: { type: String, default: '' },
+    zipCode: { type: String, default: '' },
+    country: { type: String, default: 'Philippines' }
+  },
+  profilePicture: {
+    type: String,
+    default: ''
   }
 }, {
   timestamps: true

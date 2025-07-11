@@ -30,7 +30,7 @@ const Dashboard = () => {
 
         setStats({
           orders: ordersResponse.data.data,
-          products: productsResponse.data.data,
+          products: productsResponse.data.data.products,
           users: usersResponse.data.users
         });
       } catch (error) {

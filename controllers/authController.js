@@ -238,13 +238,18 @@ exports.updateProfile = async (req, res) => {
     }
 
     // Update user
+    const updateFields = {
+      firstName: firstName?.trim(),
+      lastName: lastName?.trim(),
+      email: email?.toLowerCase()
+    };
+    if (req.body.phone !== undefined) updateFields.phone = req.body.phone;
+    if (req.body.address !== undefined) updateFields.address = req.body.address;
+    if (req.body.profilePicture !== undefined) updateFields.profilePicture = req.body.profilePicture;
+
     const updatedUser = await User.findByIdAndUpdate(
       userId,
-      {
-        firstName: firstName?.trim(),
-        lastName: lastName?.trim(),
-        email: email?.toLowerCase()
-      },
+      updateFields,
       { new: true, runValidators: true }
     ).select('-password');
 
@@ -271,12 +276,12 @@ exports.updateProfile = async (req, res) => {
       });
     }
 
-    if (error.name === 'ValidationError') {
-      const errors = Object.values(error.errors).map(err => ({
+    if (error.name === 'ValidationError' || error.errors) {
+      const errors = (error.errors ? Object.values(error.errors) : []).map(err => ({
         field: err.path,
         message: err.message
       }));
-
+      console.error('Validation errors:', errors);
       return res.status(400).json({
         success: false,
         message: 'Validation failed. Please check your input.',
@@ -409,5 +414,76 @@ exports.updateUser = async (req, res) => {
       message: 'Server error while updating user.',
       error: error.message
     });
+  }
+};
+
+// --- Shipping Address Management ---
+
+// Get all shipping addresses for current user
+exports.getShippingAddresses = async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id);
+    if (!user) {
+      return res.status(404).json({ success: false, message: 'User not found.' });
+    }
+    res.status(200).json({ success: true, addresses: user.shippingAddresses });
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Server error while fetching addresses.' });
+  }
+};
+
+// Add a new shipping address (max 2)
+exports.addShippingAddress = async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id);
+    if (!user) {
+      return res.status(404).json({ success: false, message: 'User not found.' });
+    }
+    if (user.shippingAddresses.length >= 2) {
+      return res.status(400).json({ success: false, message: 'You can only have up to 2 shipping addresses.' });
+    }
+    user.shippingAddresses.push(req.body);
+    await user.save();
+    res.status(201).json({ success: true, addresses: user.shippingAddresses });
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Server error while adding address.' });
+  }
+};
+
+// Update a shipping address by index
+exports.updateShippingAddress = async (req, res) => {
+  try {
+    const { index } = req.params;
+    const user = await User.findById(req.user.id);
+    if (!user) {
+      return res.status(404).json({ success: false, message: 'User not found.' });
+    }
+    if (index < 0 || index >= user.shippingAddresses.length) {
+      return res.status(400).json({ success: false, message: 'Invalid address index.' });
+    }
+    user.shippingAddresses[index] = req.body;
+    await user.save();
+    res.status(200).json({ success: true, addresses: user.shippingAddresses });
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Server error while updating address.' });
+  }
+};
+
+// Delete a shipping address by index
+exports.deleteShippingAddress = async (req, res) => {
+  try {
+    const { index } = req.params;
+    const user = await User.findById(req.user.id);
+    if (!user) {
+      return res.status(404).json({ success: false, message: 'User not found.' });
+    }
+    if (index < 0 || index >= user.shippingAddresses.length) {
+      return res.status(400).json({ success: false, message: 'Invalid address index.' });
+    }
+    user.shippingAddresses.splice(index, 1);
+    await user.save();
+    res.status(200).json({ success: true, addresses: user.shippingAddresses });
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Server error while deleting address.' });
   }
 };

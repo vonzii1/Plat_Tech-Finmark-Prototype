@@ -2,7 +2,7 @@
 
 A modern, scalable order management system built with Node.js, Express, MongoDB, and React. This platform addresses the scalability and performance challenges faced by FinMark Corporation, providing a robust solution for handling 3,000+ daily transactions.
 
-## Features
+## 🚀 Features
 
 ### Backend (Node.js/Express)
 - **User Authentication & Authorization**: JWT-based authentication with role-based access control
@@ -19,7 +19,7 @@ A modern, scalable order management system built with Node.js, Express, MongoDB,
 - **Dashboard**: Real-time statistics and system status
 - **Responsive Design**: Mobile-first approach
 
-## Technology Stack
+## 🛠️ Technology Stack
 
 ### Backend
 - **Node.js** - Runtime environment
@@ -41,13 +41,13 @@ A modern, scalable order management system built with Node.js, Express, MongoDB,
 - **Lucide React** - Icons
 - **React Hot Toast** - Notifications
 
-## Prerequisites
+## 📋 Prerequisites
 
 - Node.js (v14 or higher)
 - MongoDB (local or cloud)
-- npm
+- npm or yarn
 
-## Installation & Setup
+## 🚀 Installation & Setup
 
 ### 1. Clone the Repository
 ```bash
@@ -87,7 +87,7 @@ cd finmark-auth-frontend
 npm start
 ```
 
-## Project Structure
+## 📁 Project Structure
 
 ```
 finmark-financial-platform/
@@ -120,7 +120,7 @@ finmark-financial-platform/
     └── tailwind.config.js
 ```
 
-## Authentication
+## 🔐 Authentication
 
 The platform uses JWT-based authentication with the following features:
 
@@ -134,7 +134,7 @@ The platform uses JWT-based authentication with the following features:
 - **Email**: admin@finmark.com
 - **Password**: Admin123
 
-## API Endpoints
+## 📊 API Endpoints
 
 ### Authentication
 - `POST /api/auth/register` - User registration
@@ -159,7 +159,7 @@ The platform uses JWT-based authentication with the following features:
 - `DELETE /api/products/:id` - Delete product (admin)
 - `PUT /api/products/:id/stock` - Update stock (admin)
 
-## Security Features
+## 🛡️ Security Features
 
 ### Input Validation
 - **Server-side validation** using express-validator
@@ -185,7 +185,7 @@ The platform implements robust error handling for:
 - **Validation errors**
 - **Rate limiting violations**
 
-## Testing
+## 🧪 Testing
 
 ### Backend Testing
 ```bash
@@ -199,7 +199,7 @@ cd finmark-auth-frontend
 npm test
 ```
 
-## Performance Optimizations
+## 📈 Performance Optimizations
 
 - **Database indexing** for faster queries
 - **Pagination** for large datasets
@@ -207,7 +207,7 @@ npm test
 - **Caching strategies** for frequently accessed data
 - **Optimized queries** with proper aggregation
 
-## Deployment
+## 🚀 Deployment
 
 ### Backend Deployment
 1. Set up environment variables
@@ -218,7 +218,36 @@ npm test
 1. Build the application: `npm run build`
 2. Deploy the `build` folder to your hosting service
 
-## Contributing
+## 📝 API Documentation
+
+### Request/Response Format
+All API responses follow a consistent format:
+
+```json
+{
+  "success": true,
+  "message": "Operation successful",
+  "data": {
+    // Response data
+  }
+}
+```
+
+### Error Response Format
+```json
+{
+  "success": false,
+  "message": "Error description",
+  "errors": [
+    {
+      "field": "fieldName",
+      "message": "Specific error message"
+    }
+  ]
+}
+```
+
+## 🤝 Contributing
 
 1. Fork the repository
 2. Create a feature branch
@@ -226,7 +255,7 @@ npm test
 4. Add tests if applicable
 5. Submit a pull request
 
-## Project Goals
+## 🎯 Project Goals
 
 This platform successfully addresses FinMark Corporation's challenges:
 
@@ -236,7 +265,7 @@ This platform successfully addresses FinMark Corporation's challenges:
 - ✅ **Security**: Comprehensive validation and error handling
 - ✅ **Maintainability**: Modular architecture with clear separation of concerns
 
-## Future Enhancements
+## 🔄 Future Enhancements
 
 - Microservices architecture migration
 - Real-time notifications
